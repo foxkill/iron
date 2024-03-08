@@ -2,7 +2,7 @@
 
 use std::rc::Rc;
 
-use slint::{MapModel, ModelRc, SharedString, VecModel};
+use slint::{ModelRc, SharedString, VecModel};
 
 slint::include_modules!();
 
