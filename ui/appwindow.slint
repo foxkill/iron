@@ -1,0 +1,63 @@
+import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView } from "std-widgets.slint";
+import { CusipInput } from "cusipinput.slint";
+import { SecurityDisplay } from "securitydisplay.slint";
+
+export component AppWindow inherits Window {
+    in-out property rows <=> security-display.rows;
+
+    title: "Iron - The auction result viewer";
+    preferred_width: 640px;
+    preferred_height: 480px;
+    VerticalLayout {
+        padding: 20px;
+        spacing: 20px;
+        HorizontalLayout {
+            spacing: 10px;
+            CusipInput { }
+        }
+
+        HorizontalLayout {
+            Rectangle {
+                height: 20px;
+            }
+        }
+
+        TabWidget {
+            Tab {
+                title: "Detail Data";
+                security-display := SecurityDisplay { 
+                    rows: [{key: "cusip", value: "02020303"}];
+                }
+            }
+
+            Tab {
+                title: "Securities";
+                StandardTableView {
+                    columns: [
+                        { title: "Header 1" },
+                        { title: "Header 2" },
+                    ];
+                }
+            }
+
+            Tab {
+                title: "Auction Quality";
+                Rectangle { }
+            }
+        }
+
+        HorizontalLayout {
+            Rectangle {
+                height: 20px;
+            }
+        }
+
+        HorizontalLayout {
+            Rectangle { }
+
+            Button {
+                text: "Ok";
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+import { ListView, StandardListView, VerticalBox, ScrollView, HorizontalBox } from "std-widgets.slint";
+
+export struct SlMap {
+   key: string,
+   value: string, 
+}
+
+export component SecurityDisplay inherits ListView { 
+    min-height: 100px;
+    in-out property <[SlMap]> rows;
+    for row in rows: HorizontalBox {
+        height: 30px;
+        Text {
+            width: parent.width / 5;
+            text: row.key;
+        }
+        Text {
+            text: row.value;
+        }
+    }
+}
