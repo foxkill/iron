@@ -1,6 +1,9 @@
 import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView } from "std-widgets.slint";
 import { CusipInput } from "cusipinput.slint";
 import { SecurityDisplay } from "securitydisplay.slint";
+import { AppState } from "appstate.slint";
+
+export { AppState }
 
 export component AppWindow inherits Window {
     in-out property rows <=> security-display.rows;
@@ -8,12 +11,13 @@ export component AppWindow inherits Window {
     title: "Iron - The auction result viewer";
     preferred_width: 640px;
     preferred_height: 480px;
+
     VerticalLayout {
         padding: 20px;
         spacing: 20px;
         HorizontalLayout {
             spacing: 10px;
-            CusipInput { }
+            CusipInput {}
         }
 
         HorizontalLayout {

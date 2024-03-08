@@ -1,20 +1,15 @@
 // !# Auction Result Desktop App
 
-use std::rc::Rc;
 
-use slint::{ModelRc, SharedString, VecModel};
+pub mod components;
+use components::connect_cusip_handler;
 
 slint::include_modules!();
 
 fn main() -> Result<(), slint::PlatformError> {
-    let mut rows: Vec<SlMap> = Vec::<SlMap>::new();
+    let ui: AppWindow = AppWindow::new()?;
 
-    rows.push(SlMap { key: SharedString::from("CUSIP"), value: SharedString::from("91282CJZ5")});
+    connect_cusip_handler(&ui);
 
-    let vm = VecModel::from(rows);
-
-    let ui = AppWindow::new()?;
-    let mrc = ModelRc::from(Rc::new(vm));
-    ui.set_rows(mrc);
     ui.run()
 }
