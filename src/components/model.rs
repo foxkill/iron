@@ -1,34 +1,37 @@
 // !# Contains all relevant models.
-#![allow(dead_code)]
+#![allow(dead_code, unused_imports)]
+#![allow(clippy::vec_init_then_push)]
+
 use std::rc::Rc;
 
-use slint::{ModelRc, VecModel};
+use auctionresult::Get;
+use auctionresult::treasury::TreasuryAccess;
 
-use crate::SlMap;
+use slint::{ModelRc, VecModel, SharedString};
 
-type Model = ModelRc<Vec::<SlMap>>;
+use crate::{rows, SlMap};
 
 #[derive(Default)]
-pub struct SlMapModel { 
-    inner: Model,
-}
+pub struct SlMapModel { }
 
 
 impl SlMapModel {
-    pub fn new() -> Self {
-        let rows: Vec<SlMap> = vec![];
-        // rows.push(SlMap { key: SharedString::from("CUSIP"), value: SharedString::from(cu)});
-        // let vm = VecModel::from(rows);
+    pub fn create(cusip: &str) -> Vec<SlMap> {
+        let get_command = Get::new(cusip.to_owned());
+        let treasuries = get_command.get().unwrap();
+        let treasury = treasuries.first().unwrap();
 
-        // let mrc = ModelRc::from(Rc::new(vm));
-        // ui.set_rows(mrc);
-        Self {
-            // inner: ModelRc::from(Rc::new(VecModel::from(Vec::<SlMap>::new())))
-            inner: ModelRc::default()
-        }
+        let dealers = format!("{:.2}%", treasury.get_percentage_debt_purchased_by_dealers());
+        let bid_to_cover = format!("{:.2}", treasury.get_bid_to_cover_ratio());
+        println!("{:?}", treasury);
+
+        rows![
+            "Security Term:" => treasury.get_security_term(),
+            "CUSIP:" => treasury.cusip(),
+            "Reopening:" => if treasury.is_reopening() { "Yes" } else { "No" },
+            "Security Type:" => treasury.get_security_type().to_string(),
+            "Bid To Cover:" => bid_to_cover,
+            "Dealers %:" => dealers
+        ]
     }
-
-    // pub fn get(&self) -> &Vec<SlMap> {
-    //     self.inner
-    // }
 }
