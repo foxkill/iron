@@ -1,4 +1,4 @@
-import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView } from "std-widgets.slint";
+import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView, StandardButton } from "std-widgets.slint";
 import { CusipInput } from "cusipinput.slint";
 import { SecurityDisplay } from "securitydisplay.slint";
 import { AppState } from "appstate.slint";
@@ -7,6 +7,8 @@ export { AppState }
 
 export component AppWindow inherits Window {
     in-out property rows <=> security-display.rows;
+
+    callback close();
 
     title: "Iron - The auction result viewer";
     preferred_width: 640px;
@@ -37,6 +39,7 @@ export component AppWindow inherits Window {
             Tab {
                 title: "Securities";
                 StandardTableView {
+                    vertical-stretch: 1;
                     columns: [
                         { title: "Header 1" },
                         { title: "Header 2" },
@@ -58,9 +61,10 @@ export component AppWindow inherits Window {
 
         HorizontalLayout {
             Rectangle { }
-
+            StandardButton { kind: abort; }
             Button {
                 text: "Ok";
+                clicked => { close(); }
             }
         }
     }
