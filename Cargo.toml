@@ -8,6 +8,7 @@ build = "build.rs"
 
 [dependencies]
 slint = "1.4.1"
+auctionresult = { path = "../auctionresult" }
 
 [build-dependencies]
 slint-build = "1.4"
