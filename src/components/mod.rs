@@ -6,5 +6,7 @@ pub mod model;
 mod macros;
 
 pub use connect::connect_cusip_handler;
+pub use connect::connect_close;
+
 pub use handler::handle_cusip;
 pub use model::SlMapModel;
