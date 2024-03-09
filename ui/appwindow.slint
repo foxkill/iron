@@ -1,70 +1,86 @@
 import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView, StandardButton } from "std-widgets.slint";
 import { CusipInput } from "cusipinput.slint";
-import { SecurityDisplay } from "securitydisplay.slint";
+import { SecurityDisplay, SlMap } from "securitydisplay.slint";
 import { AppState } from "appstate.slint";
+import { SecuritiesTableAdapter } from "tableadapters.slint";
 
-export { AppState }
+export { AppState, SecuritiesTableAdapter, SlMap }
 
 export component AppWindow inherits Window {
-    in-out property rows <=> security-display.rows;
-
-    callback close();
-
+    callback close;
     title: "Iron - The auction result viewer";
     preferred_width: 640px;
     preferred_height: 480px;
-
     VerticalLayout {
         padding: 20px;
         spacing: 20px;
         HorizontalLayout {
             spacing: 10px;
-            CusipInput {}
+            CusipInput { }
         }
 
         HorizontalLayout {
             Rectangle {
-                height: 20px;
+                height: 2px;
+                background: grey;
             }
         }
 
-        TabWidget {
-            Tab {
-                title: "Detail Data";
-                security-display := SecurityDisplay { 
-                    rows: [{key: "cusip", value: "02020303"}];
+        HorizontalBox {
+            padding: 0px;
+            spacing: 0px;
+            TabWidget {
+                Tab {
+                    title: "Detail Data";
+                    VerticalBox {
+                        details-display := StandardTableView {
+                            vertical-stretch: 1;
+                            // columns: [
+                            //     { title: "Header 1" },
+                            //     { title: "Header 2" },
+                            // ];
+                        }
+                    }
+                    // security-display := SecurityDisplay { }
                 }
-            }
 
-            Tab {
-                title: "Securities";
-                StandardTableView {
-                    vertical-stretch: 1;
-                    columns: [
-                        { title: "Header 1" },
-                        { title: "Header 2" },
-                    ];
+                Tab {
+                    title: "Securities";
+                    VerticalBox {
+                        securities := StandardTableView {
+                            vertical-stretch: 1;
+                            columns: [];
+                            rows: SecuritiesTableAdapter.row_data ;
+                        }
+                    }
                 }
-            }
 
-            Tab {
-                title: "Auction Quality";
-                Rectangle { }
+                Tab {
+                    title: "Auction Quality";
+                    VerticalBox {
+                        quality := StandardTableView {
+                            vertical-stretch: 1;
+                        }
+                    }
+                }
             }
         }
 
         HorizontalLayout {
             Rectangle {
-                height: 20px;
+                height: 2px;
+                background: gray;
             }
         }
 
         HorizontalLayout {
             Rectangle { }
-            StandardButton { kind: abort; }
+
             Button {
-                text: "Ok";
-                clicked => { close(); }
+                text: "Close";
+                clicked => {
+                    close();
+                }
             }
         }
     }

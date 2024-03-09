@@ -7,7 +7,7 @@ use std::rc::Rc;
 use auctionresult::Get;
 use auctionresult::treasury::TreasuryAccess;
 
-use slint::{ModelRc, VecModel, SharedString};
+use slint::{ModelRc, SharedString, StandardListViewItem, VecModel};
 
 use crate::{rows, SlMap};
 
@@ -33,5 +33,33 @@ impl SlMapModel {
             "Bid To Cover:" => bid_to_cover,
             "Dealers %:" => dealers
         ]
+    }
+
+    pub fn details(cusip: &str) -> Rc<VecModel<slint::ModelRc<StandardListViewItem>>> {
+        let row_data: Rc<VecModel<slint::ModelRc<StandardListViewItem>>> = Rc::new(VecModel::default());
+
+        let get_command = Get::new(cusip.to_owned());
+        let treasuries = get_command.get().unwrap();
+        
+        for treasury in treasuries {
+
+            let items = Rc::new(VecModel::default());
+            items.push("Treasury ---------".into());
+            items.push("".into());
+            row_data.push(items.into());
+
+            let items = Rc::new(VecModel::default());
+            items.push("Security Term:".into());
+            items.push(treasury.get_security_term().into());
+            row_data.push(items.into());
+
+            let items = Rc::new(VecModel::default());
+            items.push("CUSIP".into());
+            items.push(treasury.cusip().into());
+
+            row_data.push(items.into());
+        }
+
+        row_data
     }
 }
