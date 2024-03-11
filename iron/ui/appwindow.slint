@@ -1,4 +1,4 @@
-import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView, StandardButton } from "std-widgets.slint";
+import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView, StandardButton, ComboBox } from "std-widgets.slint";
 import { CusipInput } from "cusipinput.slint";
 import { SecurityDisplay, SlMap } from "securitydisplay.slint";
 import { AppState } from "appstate.slint";
@@ -8,8 +8,9 @@ export { AppState, SecuritiesTableAdapter, SlMap }
 
 export component AppWindow inherits Window {
     callback close;
+    out property <int> tab-index: twidget.current-index;
     title: "Iron - The auction result viewer";
-    preferred_width: 640px;
+    preferred_width: 800px;
     preferred_height: 480px;
     VerticalLayout {
         padding: 20px;
@@ -29,28 +30,34 @@ export component AppWindow inherits Window {
         HorizontalBox {
             padding: 0px;
             spacing: 0px;
-            TabWidget {
+            twidget := TabWidget {
                 Tab {
                     title: "Detail Data";
                     VerticalBox {
                         details-display := StandardTableView {
                             vertical-stretch: 1;
+                            horizontal-stretch: 1;
                             // columns: [
                             //     { title: "Header 1" },
                             //     { title: "Header 2" },
                             // ];
                         }
                     }
-                    // security-display := SecurityDisplay { }
                 }
 
                 Tab {
                     title: "Securities";
                     VerticalBox {
+                        combo := ComboBox {
+                            model: ["1", "5", "10"];
+                            current-value: "5";
+                            current-index: 1;
+                        }
+
                         securities := StandardTableView {
                             vertical-stretch: 1;
                             columns: [];
-                            rows: SecuritiesTableAdapter.row_data ;
+                            rows: SecuritiesTableAdapter.row_data;
                         }
                     }
                 }

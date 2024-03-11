@@ -9,7 +9,7 @@ use auctionresult::treasury::TreasuryAccess;
 
 use slint::{ModelRc, SharedString, StandardListViewItem, VecModel};
 
-use crate::{rows, SlMap};
+use crate::{rows, add, SlMap};
 
 #[derive(Default)]
 pub struct SlMapModel { }
@@ -40,24 +40,21 @@ impl SlMapModel {
 
         let get_command = Get::new(cusip.to_owned());
         let treasuries = get_command.get().unwrap();
-        
-        for treasury in treasuries {
 
-            let items = Rc::new(VecModel::default());
-            items.push("Treasury ---------".into());
-            items.push("".into());
-            row_data.push(items.into());
-
-            let items = Rc::new(VecModel::default());
-            items.push("Security Term:".into());
-            items.push(treasury.get_security_term().into());
-            row_data.push(items.into());
-
-            let items = Rc::new(VecModel::default());
-            items.push("CUSIP".into());
-            items.push(treasury.cusip().into());
-
-            row_data.push(items.into());
+        for (counter, treasury) in treasuries.into_iter().enumerate() {
+            let col = Rc::new(VecModel::default());
+            col.push(slint::format!("{}", counter + 1).into());
+            col.push(treasury.get_original_security_term().into());
+            col.push(treasury.cusip().into());
+            col.push((if treasury.is_reopening() {"Yes"} else {"No"}).into());
+            col.push(slint::format!("{}", treasury.get_security_type()).into());
+            col.push(slint::format!("{:.2}%", treasury.get_bid_to_cover_ratio()).into());
+            col.push(slint::format!("{:.2}%", treasury.get_percentage_debt_purchased_by_dealers()).into());
+            col.push(slint::format!("{:.2}%", treasury.get_percentage_debt_purchased_by_directs()).into());
+            col.push(slint::format!("{:.2}%", treasury.get_percentage_debt_purchased_by_indirects()).into());
+            col.push(slint::format!("{:.3}%", treasury.get_high_yield()).into());
+            col.push(slint::format!("{:.3}%", treasury.get_interest_rate()).into());
+            row_data.push(col.into());
         }
 
         row_data

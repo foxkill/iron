@@ -1,7 +1,5 @@
 // !# Connects widgets to handlers.
 
-// use slint::{ModelRc, SharedString, VecModel};
-#![allow(clippy::vec_init_then_push)]
 
 use slint::ComponentHandle;
 use crate::{AppState, AppWindow, SecuritiesTableAdapter};
@@ -14,6 +12,7 @@ pub fn connect_cusip_handler(app: &AppWindow) {
         let this = ui.upgrade().unwrap();
         let rows = SlMapModel::details(cusip.as_str());
 
+        println!("Cur Index: {}", this.get_tab_index());
         this.global::<SecuritiesTableAdapter>().set_row_data(rows.clone().into());
         // this.set_rows(ModelRc::new(VecModel::from(rows)));
     });
