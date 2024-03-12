@@ -1,10 +1,24 @@
 // !# Connects widgets to handlers.
 
 
+use auctionresult::validate_cusip;
 use slint::ComponentHandle;
 use crate::{AppState, AppWindow, SecuritiesTableAdapter};
 
 use super::SlMapModel;
+
+pub fn connect_validate_cusip(app: &AppWindow) {
+    let ui = app.as_weak();
+    app.global::<AppState>().on_validate_cusip({ move |cusip| {
+        let this = ui.upgrade().unwrap();
+
+        let is_cusip = validate_cusip(cusip);
+
+        this.global::<AppState>().set_valid_cusip(is_cusip);
+
+        is_cusip
+    }});
+}
 
 pub fn connect_cusip_handler(app: &AppWindow) {
     let ui = app.as_weak();
