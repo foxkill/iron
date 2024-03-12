@@ -2,17 +2,38 @@ import { LineEdit, Button, HorizontalBox } from "std-widgets.slint";
 import { AppState } from "appstate.slint";
 
 export component CusipInput inherits HorizontalBox {
-    // in-out property <string> cusip;
-    // callback search-cusip <=> cusip-button.clicked;
+    callback cusip-changed <=> cusip-edit.edited;
+    in-out property <string> cusip;
+    in-out property <bool> valid_cusip <=> AppState.valid_cusip;
+
+    states [ 
+        disabled when valid_cusip == false: {
+            cusip-button.enabled: false;
+        }
+        enabled when valid_cusip == true: {
+            cusip-button.enabled: true;
+        }
+    ]
+
     forward-focus: cusip-edit;
-    Text { 
-        vertical-alignment: center; 
-        text: "Enter CUSIP:"; 
+
+    ta := TouchArea {
+        clicked => { cusip-edit.focus() }
+        Text {
+            vertical-alignment: center;
+            text: "Enter CUSIP:";
+        }
     }
-    cusip-edit := LineEdit { placeholder-text: "Enter CUSIP here..."; }
-    cusip-button := Button { 
-        text: "Search"; 
-        enabled: true; 
+    
+
+    cusip-edit := LineEdit {
+        placeholder-text: "Enter CUSIP here...";
+        // edited(str) => { root.cusip-changed(str) }
+    }
+
+    cusip-button := Button {
+        text: "Search";
+        enabled: true;
         clicked => {
             AppState.set-cusip(cusip-edit.text)
         }

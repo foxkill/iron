@@ -3,21 +3,28 @@ import { CusipInput } from "cusipinput.slint";
 import { SecurityDisplay, SlMap } from "securitydisplay.slint";
 import { AppState } from "appstate.slint";
 import { SecuritiesTableAdapter } from "tableadapters.slint";
+import { Resizer } from "resizer.slint";
 
 export { AppState, SecuritiesTableAdapter, SlMap }
 
 export component AppWindow inherits Window {
-    callback close;
+    in-out property <float> pitch: 0.15;
+    in-out property <float> yaw: 0.5;
     out property <int> tab-index: twidget.current-index;
+    callback close;
     title: "Iron - The auction result viewer";
-    preferred_width: 800px;
-    preferred_height: 480px;
+    preferred_width: 1024px;
+    preferred_height: 768px;
     VerticalLayout {
         padding: 20px;
         spacing: 20px;
         HorizontalLayout {
             spacing: 10px;
-            CusipInput { }
+            CusipInput {
+                cusip-changed(cusip) => {
+                    AppState.validate_cusip(cusip);
+                }
+            }
         }
 
         HorizontalLayout {
@@ -35,8 +42,8 @@ export component AppWindow inherits Window {
                     title: "Detail Data";
                     VerticalBox {
                         details-display := StandardTableView {
-                            vertical-stretch: 1;
-                            horizontal-stretch: 1;
+                            // vertical-stretch: 1;
+                            // horizontal-stretch: 1;
                             // columns: [
                             //     { title: "Header 1" },
                             //     { title: "Header 2" },
@@ -64,9 +71,70 @@ export component AppWindow inherits Window {
 
                 Tab {
                     title: "Auction Quality";
-                    VerticalBox {
-                        quality := StandardTableView {
-                            vertical-stretch: 1;
+                    vbox := VerticalBox {
+                        toolbar := HorizontalLayout {
+                            height: self.preferred-height;
+                            spacing: 10px;
+                            Text {
+                                vertical-alignment: center;
+                                text: "How many auction to look back:";
+                            }
+
+                            lookback := ComboBox {
+                                model: ["1", "5", "10"];
+                                current-value: "5";
+                                current-index: 1;
+                            }
+
+                            Text {
+                                vertical-alignment: center;
+                                text: "What to show:";
+                            }
+
+                            items := ComboBox {
+                                model: ["Bid To Cover", "Primary Dealers", "Indirects", "Directs"];
+                                current-value: "Bid To Cover";
+                                current-index: 1;
+                            }
+                        }
+
+                        hlupper := HorizontalLayout {
+                            Rectangle {
+                                border-width: 2px;
+                                border-color: red;
+                                barchart := Image {
+                                    x: 0;
+                                    y: 0;
+                                    preferred-height: 680px;
+                                    width: 100%;
+                                    height: 100%;
+                                    source: AppState.render_plot(hlupper.width, hlupper.height);
+                                }
+                            }
+                        }
+                        
+                        sp := Resizer {
+                            width: 100%;
+                            moved => {
+                                self.current-position = self.y + (self.mouse-y - self.pressed-y);
+                                if (self.current-position < vbox.y + toolbar.height + self.height + self.min-v-height) {
+                                    self.y = vbox.y + toolbar.height + self.height + self.min-v-height;
+                                } else if (self.current-position > vbox.y + vbox.height - (self.height + self.min-v-height)) {
+                                    self.y = vbox.y + vbox.height - (self.height + self.min-v-height)
+                                } else {
+                                    self.y = self.current-position;
+                                }
+
+                                hlupper.height = self.y - self.height - self.min-v-height;
+                                hllower.y = self.y + self.height + self.min-v-height;
+                                debug(hlupper.height, hllower.y);
+                           }
+                        }
+                        hllower := HorizontalLayout {
+                            quality := StandardTableView {
+                                // horizontal-stretch: 1;
+                                columns: [{ title: "No." },{ title: "Term" },{ title: "CUSIP" }];
+                            }
                         }
                     }
                 }

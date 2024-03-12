@@ -1,3 +1,10 @@
 export global AppState {
+    // Properties
+    in property <bool> valid_cusip;
+
+    
+    // Callbacks.
     pure callback set-cusip(string); 
+    pure callback validate_cusip(string) -> bool;
+    pure callback render_plot(length, length) -> image;
 }

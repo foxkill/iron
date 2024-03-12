@@ -1,0 +1,11 @@
+export component Resizer inherits TouchArea {
+    in property <length> min-v-height: 20px;
+    in property <length> current-position;
+    height: 3px;
+    mouse-cursor: ns-resize;
+    Rectangle {
+        width: 100%;
+        height: 100%;
+        background: gray;
+    }
+}
