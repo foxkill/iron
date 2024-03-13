@@ -4,7 +4,7 @@ use slint::SharedPixelBuffer;
 
 pub fn barchart(width: f32, height: f32) -> slint::Image {
     // println!("w: {} - h: {}", width, height);
-    let mut pixel_buffer = SharedPixelBuffer::new(width as u32, height as u32);
+    let mut pixel_buffer = SharedPixelBuffer::new(width as u32 - 5, height as u32 - 5);
     let size = (pixel_buffer.width(), pixel_buffer.height());
 
     let backend = BitMapBackend::with_buffer(pixel_buffer.make_mut_bytes(), size);

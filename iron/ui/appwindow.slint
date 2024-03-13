@@ -1,4 +1,4 @@
-import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView, StandardButton, ComboBox } from "std-widgets.slint";
+import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupBox, TabWidget, ListView, StandardButton, ComboBox, GridBox } from "std-widgets.slint";
 import { CusipInput } from "cusipinput.slint";
 import { SecurityDisplay, SlMap } from "securitydisplay.slint";
 import { AppState } from "appstate.slint";
@@ -34,7 +34,7 @@ export component AppWindow inherits Window {
             }
         }
 
-        HorizontalBox {
+        HorizontalLayout {
             padding: 0px;
             spacing: 0px;
             twidget := TabWidget {
@@ -71,7 +71,8 @@ export component AppWindow inherits Window {
 
                 Tab {
                     title: "Auction Quality";
-                    vbox := VerticalBox {
+                    vbox := VerticalLayout {
+                        spacing: 2px;
                         toolbar := HorizontalLayout {
                             height: self.preferred-height;
                             spacing: 10px;
@@ -102,39 +103,60 @@ export component AppWindow inherits Window {
                             Rectangle {
                                 border-width: 2px;
                                 border-color: red;
-                                barchart := Image {
-                                    x: 0;
-                                    y: 0;
-                                    preferred-height: 680px;
-                                    width: 100%;
-                                    height: 100%;
-                                    source: AppState.render_plot(hlupper.width, hlupper.height);
-                                }
+                                
+                                // barchart := Image {
+                                //     x: 0;
+                                //     y: 0;
+                                //     // preferred-height: 680px;
+                                //     width: 100%;
+                                //     height: 100%;
+                                //     source: AppState.render_plot(hlupper.width, hlupper.height);
+                                // }
+                                
                             }
                         }
                         
                         sp := Resizer {
                             width: 100%;
+                            init => {
+                                // self.vspace = hlupper.height + hllower.height;
+                                self.upper_distance = self.y - hlupper.height;
+                                self.lower_distance = hllower.y - self.y;
+                                // debug(self.vspace, hlupper.height, hllower.height);
+                            }
                             moved => {
+                                if self.vspace == 0px {
+                                    self.vspace = hlupper.height + hllower.height;
+                                }
+
                                 self.current-position = self.y + (self.mouse-y - self.pressed-y);
-                                if (self.current-position < vbox.y + toolbar.height + self.height + self.min-v-height) {
-                                    self.y = vbox.y + toolbar.height + self.height + self.min-v-height;
-                                } else if (self.current-position > vbox.y + vbox.height - (self.height + self.min-v-height)) {
+                                if (self.current-position < vbox.y + self.min-v-height) {
+                                    self.y = vbox.y + self.min-v-height;
+                                } else if (self.current-position > vbox.y + vbox.height + self.min-v-height) {
                                     self.y = vbox.y + vbox.height - (self.height + self.min-v-height)
                                 } else {
                                     self.y = self.current-position;
                                 }
 
-                                hlupper.height = self.y - self.height - self.min-v-height;
-                                hllower.y = self.y + self.height + self.min-v-height;
-                                debug(hlupper.height, hllower.y);
-                           }
-                        }
-                        hllower := HorizontalLayout {
-                            quality := StandardTableView {
-                                // horizontal-stretch: 1;
-                                columns: [{ title: "No." },{ title: "Term" },{ title: "CUSIP" }];
+                                hlupper.height = self.y - (self.upper_distance);
+                                hllower.y = self.y + (self.lower_distance);
+                                hllower.height = self.vspace - hlupper.height;
+                                // hllower.height = hllower.height;
+                                // hllower.height -= hllower.y;
+                                // hllower.height = hllower.height - (self.y + self.height);
+                                // debug(self.y, hlupper.height, hllower.y, toolbar.height);
                             }
+                        }
+
+                        hllower := HorizontalLayout {
+                            Rectangle {
+                                border-width: 2px;
+                                border-color: green;
+                            }
+                            // quality := StandardTableView {
+                            //     // horizontal-stretch: 1;
+                            //     columns: [{ title: "No." },{ title: "Term" },{ title: "CUSIP" }];
+                            // }
                         }
                     }
                 }
