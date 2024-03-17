@@ -11,6 +11,10 @@ use slint::{ModelRc, SharedString, StandardListViewItem, VecModel};
 
 use crate::{rows, add, SlMap};
 
+enum TabState {
+    Details,
+}
+
 #[derive(Default)]
 pub struct SlMapModel { }
 

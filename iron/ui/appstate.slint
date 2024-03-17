@@ -1,10 +1,19 @@
 export global AppState {
-    // Properties
+    // Properties.
     in property <bool> valid_cusip;
+    out property <string> cusip;
 
     
     // Callbacks.
+    callback takedown-changed(int);
     pure callback set-cusip(string); 
     pure callback validate_cusip(string) -> bool;
-    pure callback render_plot(length, length) -> image;
+    pure callback render_plot(length, length, int) -> image;
+
+    // Functions.
+    public function set-the-cusip(cu: string) {
+        debug("Im setting the cusip: " + cu);
+        cusip = cu;
+        AppState.set-cusip(cu);
+    }
 }
