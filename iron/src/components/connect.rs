@@ -49,7 +49,7 @@ pub fn connect_barchart(app: &AppWindow) {
         let this = ui.upgrade().unwrap();
         println!("Im retrieving the cusip: {:?} -> chg: {}", this.global::<AppState>().get_cusip(), changed);
         
-        let data = api_many_items();
+        // let data = api_many_items();
         barchart(w, h, changed)
     });
 
