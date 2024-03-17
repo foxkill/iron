@@ -8,10 +8,10 @@ import { Resizer } from "resizer.slint";
 export { AppState, SecuritiesTableAdapter, SlMap }
 
 export component AppWindow inherits Window {
-    in-out property <float> pitch: 0.15;
-    in-out property <float> yaw: 0.5;
     out property <int> tab-index: twidget.current-index;
+
     callback close;
+
     title: "Iron - The auction result viewer";
     preferred_width: 1024px;
     preferred_height: 768px;
@@ -22,7 +22,9 @@ export component AppWindow inherits Window {
             spacing: 10px;
             CusipInput {
                 cusip-changed(cusip) => {
-                    AppState.validate_cusip(cusip);
+                    if AppState.validate_cusip(cusip) {
+                        AppState.set-the-cusip(cusip);
+                    }
                 }
             }
         }
@@ -75,16 +77,35 @@ export component AppWindow inherits Window {
                         spacing: 2px;
                         toolbar := HorizontalLayout {
                             height: self.preferred-height;
-                            spacing: 10px;
+                            padding: 5px;
+                            spacing: 5px;
+                            Text {
+                                vertical-alignment: center;
+                                text: "Auction Type:";
+                            }
+
+                            auctiontype := ComboBox {
+                                model: ["2yr", "3yr", "5yr", "7yr", "10yr", "20yr", "30yr"];
+                                current-value: "10yr";
+                                current-index: 4;
+                                selected => {
+                                    barchart.changed += 1;
+                                    // AppState.takedown-changed(takedown.current-index);
+                                }
+                            }
+
                             Text {
                                 vertical-alignment: center;
                                 text: "How many auction to look back:";
                             }
 
                             lookback := ComboBox {
-                                model: ["1", "5", "10"];
-                                current-value: "5";
+                                model: ["2", "5", "10"];
                                 current-index: 1;
+                                selected => {
+                                    barchart.changed += 1;
+                                    // AppState.takedown-changed(takedown.current-index);
+                                }
                             }
 
                             Text {
@@ -92,10 +113,13 @@ export component AppWindow inherits Window {
                                 text: "What to show:";
                             }
 
-                            items := ComboBox {
+                            takedown := ComboBox {
                                 model: ["Bid To Cover", "Primary Dealers", "Indirects", "Directs"];
-                                current-value: "Bid To Cover";
-                                current-index: 1;
+                                current-index: 0;
+                                selected => {
+                                    barchart.changed += 1;
+                                    // AppState.takedown-changed(takedown.current-index);
+                                }
                             }
                         }
 
@@ -104,15 +128,15 @@ export component AppWindow inherits Window {
                                 border-width: 2px;
                                 border-color: red;
                                 
-                                // barchart := Image {
-                                //     x: 0;
-                                //     y: 0;
-                                //     // preferred-height: 680px;
-                                //     width: 100%;
-                                //     height: 100%;
-                                //     source: AppState.render_plot(hlupper.width, hlupper.height);
-                                // }
-                                
+                                barchart := Image {
+                                    property <int> changed;
+                                    x: 0;
+                                    y: 0;
+                                    // preferred-height: 680px;
+                                    width: 100%;
+                                    height: 100%;
+                                    source: AppState.render_plot(hlupper.width, hlupper.height, changed);
+                                }
                             }
                         }
                         
@@ -149,14 +173,14 @@ export component AppWindow inherits Window {
                         }
 
                         hllower := HorizontalLayout {
-                            Rectangle {
-                                border-width: 2px;
-                                border-color: green;
-                            }
-                            // quality := StandardTableView {
-                            //     // horizontal-stretch: 1;
-                            //     columns: [{ title: "No." },{ title: "Term" },{ title: "CUSIP" }];
+                            // Rectangle {
+                                // border-width: 2px;
+                                // border-color: green;
                             // }
+                            quality := StandardTableView {
+                                // horizontal-stretch: 1;
+                                columns: [{ title: "No." },{ title: "Term" },{ title: "CUSIP" }];
+                            }
                         }
                     }
                 }
