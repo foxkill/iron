@@ -1,11 +1,11 @@
 // !# Connects widgets to handlers.
 
 
-use auctionresult::validate_cusip;
+use auctionresult::{validate_cusip, SecurityType};
 use slint::ComponentHandle;
-use crate::{AppState, AppWindow, SecuritiesTableAdapter};
+use crate::{components::{barchart::{draw_barchart, empty_image}, QualityModel}, AppState, AppWindow, SecuritiesTableAdapter};
 
-use super::{barchart, SlMapModel};
+use super::SlMapModel;
 
 pub fn connect_validate_cusip(app: &AppWindow) {
     let ui = app.as_weak();
@@ -47,10 +47,23 @@ pub fn connect_barchart(app: &AppWindow) {
 
     app.global::<AppState>().on_render_plot(move |w, h, changed| {
         let this = ui.upgrade().unwrap();
-        println!("Im retrieving the cusip: {:?} -> chg: {}", this.global::<AppState>().get_cusip(), changed);
-        
-        // let data = api_many_items();
-        barchart(w, h, changed)
-    });
+        println!("Im retrieving the cusip: {:?} -> chg: {}", this.global::<AppState>().get_takedown(), changed);
 
+        let takedown = this.global::<AppState>().get_takedown();
+        let lookback = this.global::<AppState>().get_lookback();
+        let auction_type = this.global::<AppState>().get_auction_type();
+
+        println!("takedown: {:?}, lookback: {:?}, auction_type: {:?}", 
+            takedown,
+            lookback,
+            auction_type
+        );
+
+        let Ok(qm) = QualityModel::query(auction_type, lookback, takedown.into()) else {
+            return empty_image();
+        };
+
+        // empty_image()
+        draw_barchart(w, h, qm, takedown.into())
+    });
 }
