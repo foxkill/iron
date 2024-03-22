@@ -13,7 +13,7 @@ pub use connect::connect_cusip_handler;
 pub use connect::connect_barchart;
 pub use connect::connect_close;
 
-pub use barchart::barchart;
+pub use barchart::draw_barchart;
 
 pub use handler::handle_cusip;
 pub use model::SlMapModel;
