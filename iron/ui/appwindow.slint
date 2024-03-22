@@ -88,9 +88,10 @@ export component AppWindow inherits Window {
                                 model: ["2yr", "3yr", "5yr", "7yr", "10yr", "20yr", "30yr"];
                                 current-value: "10yr";
                                 current-index: 4;
+                                init => { AppState.auction-type = self.current-value; }
                                 selected => {
+                                    AppState.auction-type = self.current-value;
                                     barchart.changed += 1;
-                                    // AppState.takedown-changed(takedown.current-index);
                                 }
                             }
 
@@ -102,9 +103,10 @@ export component AppWindow inherits Window {
                             lookback := ComboBox {
                                 model: ["2", "5", "10"];
                                 current-index: 1;
+                                init => { AppState.lookback = self.current-value; }
                                 selected => {
+                                    AppState.lookback = self.current-value;
                                     barchart.changed += 1;
-                                    // AppState.takedown-changed(takedown.current-index);
                                 }
                             }
 
@@ -116,9 +118,12 @@ export component AppWindow inherits Window {
                             takedown := ComboBox {
                                 model: ["Bid To Cover", "Primary Dealers", "Indirects", "Directs"];
                                 current-index: 0;
+                                init => {
+                                    AppState.takedown = self.current-index;
+                                }
                                 selected => {
+                                    AppState.takedown = self.current-index;
                                     barchart.changed += 1;
-                                    // AppState.takedown-changed(takedown.current-index);
                                 }
                             }
                         }

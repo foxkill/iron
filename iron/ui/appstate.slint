@@ -2,6 +2,10 @@ export global AppState {
     // Properties.
     in property <bool> valid_cusip;
     out property <string> cusip;
+    in property <int> takedown;
+    in property <string> lookback;
+    // Can be: 2yr, 3yr, 5yr, 7yr, 10yr, 20yr, 30yr.
+    in property <string> auction-type;
 
     
     // Callbacks.
