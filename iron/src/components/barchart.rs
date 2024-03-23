@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
 // !# Graph Generation
-use plotters::prelude::*;
+use plotters::{prelude::*, style::text_anchor::{HPos, Pos, VPos}};
 use slint::SharedPixelBuffer;
 
 use super::qualitymodel::{DataPair, TakeDown};
@@ -29,6 +29,14 @@ use super::qualitymodel::{DataPair, TakeDown};
     Ok(())
 }).style("width:100%")*/
 
+/*
+.draw_series(
+                    vec![(0.1f64, 0.5f64), (0.5f64, 0.5f64), (0.5f64, 0.1f64)]
+                        .iter()
+                        .map(|e| Circle::new(*e, 3i32, BLUE))
+                )
+ */
+
 pub fn empty_image() -> slint::Image {
     let mut pixel_buffer = SharedPixelBuffer::new(1, 1);
     let size = (pixel_buffer.width(), pixel_buffer.height());
@@ -47,6 +55,7 @@ pub fn draw_barchart(
     width: f32,
     height: f32,
     datavec: Vec<DataPair>,
+    auction_type: impl Into<String>,
     takedown: TakeDown,
 ) -> slint::Image {
     // println!("w: {} - h: {}", width, height);
@@ -73,7 +82,7 @@ pub fn draw_barchart(
         .margin_right(5)
         .set_label_area_size(LabelAreaPosition::Left, 20)
         .set_label_area_size(LabelAreaPosition::Bottom, 20)
-        .caption(takedown.to_string(), ("sans-serif", 15))
+        .caption(format!("{} {}", auction_type.into(), takedown), ("sans-serif", 15))
         // .build_cartesian_2d((0..datavec.len() - 1).into_segmented(), 0..maxopt.unwrap().x_axis as i32)
         .build_cartesian_2d((0..datavec.len() as i32 - 1).into_segmented(), 0.0..maxopt)
         .expect("Error building coordinate system");
@@ -106,6 +115,21 @@ pub fn draw_barchart(
         bar
     }))
     .expect("Error drawing series data");
+
+    ctx.draw_series((0i32..).zip(values.iter()).map(|(x, y)| {
+        let pos = Pos::new(HPos::Center, VPos::Top);
+        let style = ("sans-serif", 20).into_font().color(&WHITE).pos(pos);
+        let x0 = SegmentValue::CenterOf(x);
+        let y0 = *y;
+        let y1 = y0 - (y0*0.05);
+
+        let value = match takedown {
+            TakeDown::BidToCover => format!("{:.2}", y0),
+            _ => format!("{:.2}", y0),
+        };
+
+        Text::new(value, (x0, y1), style)
+    })).expect("Error drawing text values");
 
     drop(ctx);
     drop(root_area);
