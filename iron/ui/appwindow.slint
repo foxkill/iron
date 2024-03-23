@@ -88,7 +88,9 @@ export component AppWindow inherits Window {
                                 model: ["2yr", "3yr", "5yr", "7yr", "10yr", "20yr", "30yr"];
                                 current-value: "10yr";
                                 current-index: 4;
-                                init => { AppState.auction-type = self.current-value; }
+                                init => {
+                                    AppState.auction-type = self.current-value;
+                                }
                                 selected => {
                                     AppState.auction-type = self.current-value;
                                     barchart.changed += 1;
@@ -103,7 +105,9 @@ export component AppWindow inherits Window {
                             lookback := ComboBox {
                                 model: ["2", "5", "10"];
                                 current-index: 1;
-                                init => { AppState.lookback = self.current-value; }
+                                init => {
+                                    AppState.lookback = self.current-value;
+                                }
                                 selected => {
                                     AppState.lookback = self.current-value;
                                     barchart.changed += 1;
@@ -115,7 +119,7 @@ export component AppWindow inherits Window {
                                 text: "What to show:";
                             }
 
-                            takedown := ComboBox {
+                            ComboBox {
                                 model: ["Bid To Cover", "Primary Dealers", "Indirects", "Directs"];
                                 current-index: 0;
                                 init => {
@@ -132,7 +136,6 @@ export component AppWindow inherits Window {
                             Rectangle {
                                 border-width: 2px;
                                 border-color: red;
-                                
                                 barchart := Image {
                                     property <int> changed;
                                     x: 0;
@@ -144,7 +147,7 @@ export component AppWindow inherits Window {
                                 }
                             }
                         }
-                        
+
                         sp := Resizer {
                             width: 100%;
                             init => {
@@ -157,7 +160,6 @@ export component AppWindow inherits Window {
                                 if self.vspace == 0px {
                                     self.vspace = hlupper.height + hllower.height;
                                 }
-
                                 self.current-position = self.y + (self.mouse-y - self.pressed-y);
                                 if (self.current-position < vbox.y + self.min-v-height) {
                                     self.y = vbox.y + self.min-v-height;
@@ -184,7 +186,7 @@ export component AppWindow inherits Window {
                             // }
                             quality := StandardTableView {
                                 // horizontal-stretch: 1;
-                                columns: [{ title: "No." },{ title: "Term" },{ title: "CUSIP" }];
+                                columns: [{ title: "No." }, { title: "Term" }, { title: "CUSIP" }];
                             }
                         }
                     }
