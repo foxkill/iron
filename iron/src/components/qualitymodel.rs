@@ -72,13 +72,10 @@ impl QualityModel {
         lookback: impl Into<String>,
         takedown: TakeDown,
     ) -> Result<Vec<DataPair>, AuctionResultError> {
-        let timerange = lookback.into().parse::<u32>().unwrap();
+        // TODO: map err to AuctionResultError.
+        let lookback_auctions = lookback.into().parse::<usize>().unwrap();
 
-        let now = Utc::now();
-
-        let at_that_time = now.checked_sub_months(Months::new(timerange));
-        let diff = now.with_timezone(&Utc) - at_that_time.unwrap().with_timezone(&Utc);
-        let days = diff.num_days() as usize;
+        let days = QualityModel::to_days(lookback_auctions);
 
         let stype = auction_type.into();
 
@@ -96,35 +93,26 @@ impl QualityModel {
             return Err(result.unwrap_err());
         };
 
-        let fptr = match takedown {
-            TakeDown::BidToCover => |value: &Treasury| DataPair {
-                value: value.get_bid_to_cover_ratio(),
-                date: value.get_issue_date(),
-            },
-            TakeDown::PrimaryDealers => |value: &Treasury| DataPair {
-                value: value.get_percentage_debt_purchased_by_dealers(),
-                date: value.get_issue_date(),
-            },
-            TakeDown::Indirects => |value: &Treasury| DataPair {
-                value: value.get_percentage_debt_purchased_by_indirects(),
-                date: value.get_issue_date(),
-            },
-            TakeDown::Directs => |value: &Treasury| DataPair {
-                value: value.get_percentage_debt_purchased_by_directs(),
-                date: value.get_issue_date(),
-            },
-            TakeDown::None => |value: &Treasury| DataPair {
-                value: 0.,
-                date: value.get_issue_date(),
-            },
-        };
-
-        let result = treasuries.iter().map(fptr).collect::<Vec<_>>();
-
-        Ok(result)
+        Ok(QualityModel::process_treasuries(&treasuries, &takedown))
     }
 
-    fn to_security_type(security_type: impl Into<String>) -> Result<SecurityType, AuctionResultError> {
+    /// Use the number of auction to look back to get the equivalent number of days.
+    pub fn to_days(lookback_auctions: usize) -> usize {
+        let now = Utc::now();
+
+        let at_that_time = now.checked_sub_months(Months::new(lookback_auctions as u32));
+        let diff = now.with_timezone(&Utc) - at_that_time.unwrap().with_timezone(&Utc);
+
+        diff.num_days() as usize
+    }
+
+    fn process_treasuries(treasuries: &[Treasury], takedown: &TakeDown) -> Vec<DataPair> {
+        treasuries.iter().map(|t| t.get_data_pair(takedown)).collect()
+    }
+
+    fn to_security_type(
+        security_type: impl Into<String>,
+    ) -> Result<SecurityType, AuctionResultError> {
         let tenor = Tenor::parse(security_type)?;
         let security = match (tenor.security(), tenor.shortcut()) {
             (20..=30, "y") => SecurityType::Bond,
@@ -133,6 +121,34 @@ impl QualityModel {
         };
 
         Ok(security)
+    }
+}
+
+trait DataPairTrait {
+    fn get_data_pair(&self, takedown: &TakeDown) -> DataPair;
+}
+
+impl DataPairTrait for Treasury {
+    fn get_data_pair(&self, takedown: &TakeDown) -> DataPair {
+        match takedown {
+            TakeDown::BidToCover => DataPair {
+                value: self.get_bid_to_cover_ratio(),
+                date: self.get_issue_date(),
+            },
+            TakeDown::PrimaryDealers => DataPair {
+                value: self.get_percentage_debt_purchased_by_dealers(),
+                date: self.get_issue_date(),
+            },
+            TakeDown::Indirects => DataPair {
+                value: self.get_percentage_debt_purchased_by_indirects(),
+                date: self.get_issue_date(),
+            },
+            TakeDown::Directs => DataPair {
+                value: self.get_percentage_debt_purchased_by_directs(),
+                date: self.get_issue_date(),
+            },
+            TakeDown::None => DataPair { value: 0.0, date: self.get_issue_date() },
+        }
     }
 }
 
