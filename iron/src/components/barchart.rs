@@ -63,10 +63,8 @@ pub fn draw_barchart(
         .iter()
         .max_by(|a, b| a.partial_cmp(b).unwrap())
         .unwrap()
-        .x_axis
+        .value
         .ceil();
-
-    let dates = datavec.iter().map(|elem| elem.y_axis).collect::<Vec<_>>();
 
     let mut ctx = ChartBuilder::on(&root_area)
         .margin_left(20)
@@ -77,31 +75,34 @@ pub fn draw_barchart(
         .set_label_area_size(LabelAreaPosition::Bottom, 20)
         .caption(takedown.to_string(), ("sans-serif", 15))
         // .build_cartesian_2d((0..datavec.len() - 1).into_segmented(), 0..maxopt.unwrap().x_axis as i32)
-        .build_cartesian_2d(dates.into_segmented(), 0.0..maxopt)
+        .build_cartesian_2d((0..datavec.len() as i32 - 1).into_segmented(), 0.0..maxopt)
         .expect("Error building coordinate system");
 
     ctx.configure_mesh()
         .x_label_formatter(&|x| {
-            let date = match x {
-                SegmentValue::Exact(coord) => **coord,
-                SegmentValue::CenterOf(coord) => **coord,
-                SegmentValue::Last => NaiveDateTime::MAX,
+            let index = match x {
+                SegmentValue::Exact(coord) => *coord,
+                SegmentValue::CenterOf(coord) => *coord,
+                SegmentValue::Last => 0i32
             };
-            date.format("%b-%y").to_string()
+            let date = datavec.get(index as usize).unwrap();
+            date.date.format("%b-%y").to_string()
         })
         .y_label_formatter(&|y| match takedown {
             TakeDown::BidToCover => format!("{:.2}", *y),
             _ => format!("{:.1}%", *y),
         })
-        .disable_mesh()
+        .disable_x_mesh()
+        // .disable_mesh()
         .draw()
         .expect("error drawing axis");
-
-    ctx.draw_series((0..).zip(datavec.iter()).map(|(x, y)| {
+    
+    let values = datavec.iter().map(|elem| elem.value).collect::<Vec<_>>();
+    ctx.draw_series((0..).zip(values.iter()).map(|(x, y)| {
         let x0 = SegmentValue::Exact(x);
         let x1 = SegmentValue::Exact(x + 1);
-        let mut bar = Rectangle::new([(x0, 0), (x1, *y)], RED.filled());
-        bar.set_margin(0, 0, 5, 5);
+        let mut bar = Rectangle::new([(x0, 0.0), (x1, *y)], RGBColor(23, 161, 206).filled());
+        bar.set_margin(0, 0, 20, 20);
         bar
     }))
     .expect("Error drawing series data");

@@ -1,7 +1,7 @@
 // !# Connects widgets to handlers.
 
 
-use auctionresult::{validate_cusip, SecurityType};
+use auctionresult::validate_cusip;
 use slint::ComponentHandle;
 use crate::{components::{barchart::{draw_barchart, empty_image}, QualityModel}, AppState, AppWindow, SecuritiesTableAdapter};
 
