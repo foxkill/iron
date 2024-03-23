@@ -4,22 +4,16 @@ use std::{fmt::Display, str::FromStr};
 
 use auctionresult::{
     tenor::Tenor,
-    treasury::{security_type, AuctionResultError, Treasury, TreasuryAccess},
+    treasury::{AuctionResultError, Treasury, TreasuryAccess},
     Latest, SecurityType,
 };
 use chrono::{Months, NaiveDateTime, Utc};
 
 #[derive(Debug, PartialEq, PartialOrd, Default)]
 pub struct DataPair {
-    pub x_axis: f64,
-    pub y_axis: NaiveDateTime,
+    pub value: f64,
+    pub date: NaiveDateTime,
 }
-
-// impl Default for DataPair {
-//     fn default() -> Self {
-//         Self { x_axis: Default::default(), y_axis: Default::default() }
-//     }
-// }
 
 pub enum TakeDown {
     BidToCover,
@@ -70,7 +64,6 @@ impl Display for TakeDown {
         write!(f, "{}", str_repr)
     }
 }
-
 pub struct QualityModel;
 
 impl QualityModel {
@@ -105,24 +98,24 @@ impl QualityModel {
 
         let fptr = match takedown {
             TakeDown::BidToCover => |value: &Treasury| DataPair {
-                x_axis: value.get_bid_to_cover_ratio(),
-                y_axis: value.get_issue_date(),
+                value: value.get_bid_to_cover_ratio(),
+                date: value.get_issue_date(),
             },
             TakeDown::PrimaryDealers => |value: &Treasury| DataPair {
-                x_axis: value.get_percentage_debt_purchased_by_dealers(),
-                y_axis: value.get_issue_date(),
+                value: value.get_percentage_debt_purchased_by_dealers(),
+                date: value.get_issue_date(),
             },
             TakeDown::Indirects => |value: &Treasury| DataPair {
-                x_axis: value.get_percentage_debt_purchased_by_indirects(),
-                y_axis: value.get_issue_date(),
+                value: value.get_percentage_debt_purchased_by_indirects(),
+                date: value.get_issue_date(),
             },
             TakeDown::Directs => |value: &Treasury| DataPair {
-                x_axis: value.get_percentage_debt_purchased_by_directs(),
-                y_axis: value.get_issue_date(),
+                value: value.get_percentage_debt_purchased_by_directs(),
+                date: value.get_issue_date(),
             },
             TakeDown::None => |value: &Treasury| DataPair {
-                x_axis: 0.,
-                y_axis: value.get_issue_date(),
+                value: 0.,
+                date: value.get_issue_date(),
             },
         };
 
@@ -157,8 +150,8 @@ mod tests {
         let btc = result
             .iter()
             .map(|value| DataPair {
-                x_axis: value.get_bid_to_cover_ratio(),
-                y_axis: value.get_issue_date(),
+                value: value.get_bid_to_cover_ratio(),
+                date: value.get_issue_date(),
             })
             .collect::<Vec<_>>();
         println!("{:?}", btc);
