@@ -47,16 +47,17 @@ pub fn connect_barchart(app: &AppWindow) {
 
     app.global::<AppState>().on_render_plot(move |w, h, changed| {
         let this = ui.upgrade().unwrap();
-        println!("Im retrieving the cusip: {:?} -> chg: {}", this.global::<AppState>().get_takedown(), changed);
+        println!("Im retrieving the cusip: {:?} -> chg: {}", this.global::<AppState>().get_cusip(), changed);
 
         let takedown = this.global::<AppState>().get_takedown();
         let lookback = this.global::<AppState>().get_lookback();
         let auction_type = this.global::<AppState>().get_auction_type();
 
-        println!("takedown: {:?}, lookback: {:?}, auction_type: {:?}", 
+        println!("takedown: {:?}, lookback: {:?}, auction_type: {:?}, days: {}", 
             takedown,
             lookback,
-            auction_type
+            auction_type,
+            QualityModel::to_days(lookback.parse::<usize>().unwrap())
         );
 
         let Ok(qm) = QualityModel::query(auction_type, lookback, takedown.into()) else {
@@ -64,6 +65,12 @@ pub fn connect_barchart(app: &AppWindow) {
         };
 
         // empty_image()
-        draw_barchart(w, h, qm, takedown.into())
+        draw_barchart(
+            w, 
+            h, 
+            qm, 
+            this.global::<AppState>().get_auction_type(), 
+            takedown.into()
+        )
     });
 }
