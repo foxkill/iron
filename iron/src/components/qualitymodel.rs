@@ -4,7 +4,7 @@ use std::{fmt::Display, str::FromStr};
 
 use auctionresult::{
     tenor::Tenor,
-    treasury::{AuctionResultError, Treasury, TreasuryAccess},
+    treasury::{AuctionResultError, Treasuries, Treasury, TreasuryAccess},
     Latest, SecurityType,
 };
 use chrono::{Months, NaiveDateTime, Utc};
@@ -65,65 +65,6 @@ impl Display for TakeDown {
     }
 }
 pub struct QualityModel;
-
-impl QualityModel {
-    pub fn query(
-        auction_type: impl Into<String>,
-        lookback: impl Into<String>,
-        takedown: TakeDown,
-    ) -> Result<Vec<DataPair>, AuctionResultError> {
-        // TODO: map err to AuctionResultError.
-        let lookback_auctions = lookback.into().parse::<usize>().unwrap();
-
-        let days = QualityModel::to_days(lookback_auctions);
-
-        let stype = auction_type.into();
-
-        // Get the tenor from the auction type.
-        let tenor = Tenor::parse(stype.to_owned())?;
-        // Get the security type from the auction type.
-
-        let st = QualityModel::to_security_type(stype)?;
-
-        let latest_command = Latest::new(st, days, tenor);
-
-        let result = latest_command.get();
-
-        let Ok(treasuries) = result else {
-            return Err(result.unwrap_err());
-        };
-
-        Ok(QualityModel::process_treasuries(&treasuries, &takedown))
-    }
-
-    /// Use the number of auction to look back to get the equivalent number of days.
-    pub fn to_days(lookback_auctions: usize) -> usize {
-        let now = Utc::now();
-
-        let at_that_time = now.checked_sub_months(Months::new(lookback_auctions as u32));
-        let diff = now.with_timezone(&Utc) - at_that_time.unwrap().with_timezone(&Utc);
-
-        diff.num_days() as usize
-    }
-
-    fn process_treasuries(treasuries: &[Treasury], takedown: &TakeDown) -> Vec<DataPair> {
-        treasuries.iter().map(|t| t.get_data_pair(takedown)).collect()
-    }
-
-    fn to_security_type(
-        security_type: impl Into<String>,
-    ) -> Result<SecurityType, AuctionResultError> {
-        let tenor = Tenor::parse(security_type)?;
-        let security = match (tenor.security(), tenor.shortcut()) {
-            (20..=30, "y") => SecurityType::Bond,
-            (2..=10, "y") => SecurityType::Note,
-            _ => return Err(AuctionResultError::NoTreasury),
-        };
-
-        Ok(security)
-    }
-}
-
 trait DataPairTrait {
     fn get_data_pair(&self, takedown: &TakeDown) -> DataPair;
 }
@@ -151,6 +92,65 @@ impl DataPairTrait for Treasury {
         }
     }
 }
+impl QualityModel {
+    pub fn query(
+        auction_type: impl Into<String>,
+        lookback: impl Into<String>,
+        _takedown: TakeDown,
+    ) -> Result<Treasuries, AuctionResultError> {
+        // TODO: map err to AuctionResultError.
+        let lookback_auctions = lookback.into().parse::<usize>().unwrap();
+
+        let days = QualityModel::to_days(lookback_auctions);
+
+        let stype = auction_type.into();
+
+        // Get the tenor from the auction type.
+        let tenor = Tenor::parse(stype.to_owned())?;
+
+        // Get the security type from the auction type.
+        let st = QualityModel::to_security_type(stype)?;
+
+        let latest_command = Latest::new(st, days, tenor);
+
+        let result = latest_command.get();
+
+        let Ok(treasuries) = result else {
+            return Err(result.unwrap_err());
+        };
+
+        Ok(treasuries)
+    }
+
+    /// Use the number of auction to look back to get the equivalent number of days.
+    pub fn to_days(lookback_auctions: usize) -> usize {
+        let now = Utc::now();
+
+        let at_that_time = now.checked_sub_months(Months::new(lookback_auctions as u32));
+        let diff = now.with_timezone(&Utc) - at_that_time.unwrap().with_timezone(&Utc);
+
+        diff.num_days() as usize
+    }
+
+    pub fn process_treasuries(treasuries: &[Treasury], takedown: &TakeDown) -> Vec<DataPair> {
+        treasuries.iter().map(|t| t.get_data_pair(takedown)).collect()
+    }
+
+    fn to_security_type(
+        security_type: impl Into<String>,
+    ) -> Result<SecurityType, AuctionResultError> {
+        let tenor = Tenor::parse(security_type)?;
+        let security = match (tenor.security(), tenor.shortcut()) {
+            (20..=30, "y") => SecurityType::Bond,
+            (2..=10, "y") => SecurityType::Note,
+            _ => return Err(AuctionResultError::NoTreasury),
+        };
+
+        Ok(security)
+    }
+}
+
+
 
 #[cfg(test)]
 mod tests {
