@@ -4,20 +4,62 @@
 
 use std::rc::Rc;
 
-use auctionresult::Get;
 use auctionresult::treasury::TreasuryAccess;
+use auctionresult::{treasury::Treasury, Get};
 
 use slint::{ModelRc, SharedString, StandardListViewItem, VecModel};
 
-use crate::{rows, add, SlMap};
+use crate::{add, rows, SlMap};
 
 enum TabState {
     Details,
 }
 
 #[derive(Default)]
-pub struct SlMapModel { }
+pub struct SlMapModel {}
 
+pub trait SlintModelTrait {
+    fn to_slint_model(&self, counter: usize) -> Rc<VecModel<StandardListViewItem>>;
+}
+
+impl SlintModelTrait for Treasury {
+    fn to_slint_model(&self, counter: usize) -> Rc<VecModel<StandardListViewItem>> {
+        // let row_data: Rc<VecModel<slint::ModelRc<StandardListViewItem>>> = Rc::new(VecModel::default());
+
+        let col = Rc::new(VecModel::default());
+        col.push(slint::format!("{}", counter + 1).into());
+        col.push(self.get_original_security_term().into());
+        col.push(self.cusip().into());
+        col.push((if self.is_reopening() { "Yes" } else { "No" }).into());
+        col.push(slint::format!("{}", self.get_security_type()).into());
+        col.push(slint::format!("{:.2}%", self.get_bid_to_cover_ratio()).into());
+        col.push(
+            slint::format!(
+                "{:.2}%",
+                self.get_percentage_debt_purchased_by_dealers()
+            )
+            .into(),
+        );
+        col.push(
+            slint::format!(
+                "{:.2}%",
+                self.get_percentage_debt_purchased_by_directs()
+            )
+            .into(),
+        );
+        col.push(
+            slint::format!(
+                "{:.2}%",
+                self.get_percentage_debt_purchased_by_indirects()
+            )
+            .into(),
+        );
+        col.push(slint::format!("{:.3}%", self.get_high_yield()).into());
+        col.push(slint::format!("{:.3}%", self.get_interest_rate()).into());
+
+        col
+    }
+}
 
 impl SlMapModel {
     pub fn create(cusip: &str) -> Vec<SlMap> {
@@ -25,7 +67,10 @@ impl SlMapModel {
         let treasuries = get_command.get().unwrap();
         let treasury = treasuries.first().unwrap();
 
-        let dealers = format!("{:.2}%", treasury.get_percentage_debt_purchased_by_dealers());
+        let dealers = format!(
+            "{:.2}%",
+            treasury.get_percentage_debt_purchased_by_dealers()
+        );
         let bid_to_cover = format!("{:.2}", treasury.get_bid_to_cover_ratio());
         println!("{:?}", treasury);
 
@@ -40,7 +85,8 @@ impl SlMapModel {
     }
 
     pub fn details(cusip: &str) -> Rc<VecModel<slint::ModelRc<StandardListViewItem>>> {
-        let row_data: Rc<VecModel<slint::ModelRc<StandardListViewItem>>> = Rc::new(VecModel::default());
+        let row_data: Rc<VecModel<slint::ModelRc<StandardListViewItem>>> =
+            Rc::new(VecModel::default());
 
         let get_command = Get::new(cusip.to_owned());
         let treasuries = get_command.get().unwrap();
@@ -50,12 +96,30 @@ impl SlMapModel {
             col.push(slint::format!("{}", counter + 1).into());
             col.push(treasury.get_original_security_term().into());
             col.push(treasury.cusip().into());
-            col.push((if treasury.is_reopening() {"Yes"} else {"No"}).into());
+            col.push((if treasury.is_reopening() { "Yes" } else { "No" }).into());
             col.push(slint::format!("{}", treasury.get_security_type()).into());
             col.push(slint::format!("{:.2}%", treasury.get_bid_to_cover_ratio()).into());
-            col.push(slint::format!("{:.2}%", treasury.get_percentage_debt_purchased_by_dealers()).into());
-            col.push(slint::format!("{:.2}%", treasury.get_percentage_debt_purchased_by_directs()).into());
-            col.push(slint::format!("{:.2}%", treasury.get_percentage_debt_purchased_by_indirects()).into());
+            col.push(
+                slint::format!(
+                    "{:.2}%",
+                    treasury.get_percentage_debt_purchased_by_dealers()
+                )
+                .into(),
+            );
+            col.push(
+                slint::format!(
+                    "{:.2}%",
+                    treasury.get_percentage_debt_purchased_by_directs()
+                )
+                .into(),
+            );
+            col.push(
+                slint::format!(
+                    "{:.2}%",
+                    treasury.get_percentage_debt_purchased_by_indirects()
+                )
+                .into(),
+            );
             col.push(slint::format!("{:.3}%", treasury.get_high_yield()).into());
             col.push(slint::format!("{:.3}%", treasury.get_interest_rate()).into());
             row_data.push(col.into());
