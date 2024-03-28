@@ -1,41 +1,8 @@
-use chrono::NaiveDateTime;
 // !# Graph Generation
 use plotters::{prelude::*, style::text_anchor::{HPos, Pos, VPos}};
 use slint::SharedPixelBuffer;
 
 use super::qualitymodel::{DataPair, TakeDown};
-/*evcxr_figure((640, 480), |root| {
-    let mut chart = ChartBuilder::on(&root)
-        .caption("Histogram", ("Arial", 20).into_font())
-        .x_label_area_size(50)
-        .y_label_area_size(50)
-        .build_cartesian_2d(0u32..100u32, 0f64..0.5f64)?;
-
-    chart.configure_mesh()
-        .disable_x_mesh()
-        .disable_y_mesh()
-        .y_labels(5)
-        .x_label_formatter(&|x| format!("{:.1}", *x as f64 / 100.0))
-        .y_label_formatter(&|y| format!("{}%", (*y * 100.0) as u32))
-        .draw()?;
-
-    let hist = Histogram::vertical(&chart)
-        .style(RED.filled())
-        .margin(0)
-        .data(random_samples.iter().map(|(x,_)| ((x*100.0) as u32, 0.01)));
-
-    let _ = chart.draw_series(hist);
-
-    Ok(())
-}).style("width:100%")*/
-
-/*
-.draw_series(
-                    vec![(0.1f64, 0.5f64), (0.5f64, 0.5f64), (0.5f64, 0.1f64)]
-                        .iter()
-                        .map(|e| Circle::new(*e, 3i32, BLUE))
-                )
- */
 
 pub fn empty_image() -> slint::Image {
     let mut pixel_buffer = SharedPixelBuffer::new(1, 1);
@@ -84,7 +51,7 @@ pub fn draw_barchart(
         .margin_right(5)
         .set_label_area_size(LabelAreaPosition::Left, 40)
         .set_label_area_size(LabelAreaPosition::Bottom, 40)
-        .caption(format!("{} {}", auction_type.into(), takedown), ("sans-serif", 15).with_color(&WHITE))
+        .caption(format!("{} {}", auction_type.into(), takedown), ("sans-serif", 15).with_color(WHITE))
         // .build_cartesian_2d((0..datavec.len() - 1).into_segmented(), 0..maxopt.unwrap().x_axis as i32)
         .build_cartesian_2d((0..datavec.len() as i32 - 1).into_segmented(), 0.0..maxopt)
         .expect("Error building coordinate system");
