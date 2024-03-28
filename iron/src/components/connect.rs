@@ -1,10 +1,13 @@
 // !# Connects widgets to handlers.
-
-
+use std::rc::Rc;
 use auctionresult::validate_cusip;
-use slint::ComponentHandle;
-use crate::{components::{barchart::{draw_barchart, empty_image}, QualityModel}, AppState, AppWindow, SecuritiesTableAdapter};
+use slint::{ComponentHandle, StandardListViewItem, VecModel};
+use crate::{
+    components::{barchart::{draw_barchart, empty_image}, 
+    model::SlintModelTrait, QualityModel}, AppState, AppWindow, SecuritiesTableAdapter
+};
 
+use crate::QualityTableAdapter;
 use super::SlMapModel;
 
 pub fn connect_validate_cusip(app: &AppWindow) {
@@ -64,11 +67,23 @@ pub fn connect_barchart(app: &AppWindow) {
             return empty_image();
         };
 
+        let row_data: Rc<VecModel<slint::ModelRc<StandardListViewItem>>> = Rc::new(VecModel::default());
+
+        for (counter, treasury) in qm.iter().enumerate() {
+            let col: Rc<VecModel<StandardListViewItem>> = treasury.to_slint_model(counter);
+            row_data.push(col.into());
+        }
+
+        this.global::<QualityTableAdapter>().set_row_data(row_data.clone().into());
+        // this.global::<QualityTableAdapter>().set_column_data();
+
+        let datavec = QualityModel::process_treasuries(&qm, &takedown.into());
+
         // empty_image()
         draw_barchart(
             w, 
             h, 
-            qm, 
+            datavec, 
             this.global::<AppState>().get_auction_type(), 
             takedown.into()
         )
