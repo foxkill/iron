@@ -1,11 +1,12 @@
-export global SecuritiesTableAdapter {
-    in property <[[StandardListViewItem]]> row_data;
-}
-
 export global DetailsTableAdapter {
     in property <[[StandardListViewItem]]> row_data;
 }
 
 export global QualityTableAdapter {
+    in property <[[StandardListViewItem]]> row_data;
+    in property <[TableColumn]> column_data;
+}
+
+export global SecuritiesTableAdapter {
     in property <[[StandardListViewItem]]> row_data;
 }

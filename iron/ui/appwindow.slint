@@ -2,10 +2,10 @@ import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupB
 import { CusipInput } from "cusipinput.slint";
 import { SecurityDisplay, SlMap } from "securitydisplay.slint";
 import { AppState } from "appstate.slint";
-import { SecuritiesTableAdapter } from "tableadapters.slint";
+import { SecuritiesTableAdapter, QualityTableAdapter } from "tableadapters.slint";
 import { Resizer } from "resizer.slint";
 
-export { AppState, SecuritiesTableAdapter, SlMap }
+export { AppState, SecuritiesTableAdapter, QualityTableAdapter, SlMap }
 
 export component AppWindow inherits Window {
     out property <int> tab-index: twidget.current-index;
@@ -186,7 +186,20 @@ export component AppWindow inherits Window {
                             // }
                             quality := StandardTableView {
                                 // horizontal-stretch: 1;
-                                columns: [{ title: "No." }, { title: "Term" }, { title: "CUSIP" }];
+                                columns: [
+                                    { title: "No." }, 
+                                    { title: "Security Term" }, 
+                                    { title: "CUSIP" },
+                                    { title: "Reopen?" },
+                                    { title: "Type" },
+                                    { title: "BTC" },
+                                    { title: "Dealers %" },
+                                    { title: "Directs %" },
+                                    { title: "Indirects %" },
+                                    { title: "Yield" },
+                                    { title: "Interest" },
+                                ];
+                                rows: QualityTableAdapter.row_data;
                             }
                         }
                     }
