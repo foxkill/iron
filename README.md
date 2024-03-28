@@ -4,10 +4,10 @@ Iron is a tool which was written in Rust and which allows it to view the results
 
 This screenshot shows the Percentage of Indirects takedown for the 10yr tenor:
 
-![Indirects](https://github.com/foxkill/iron/assets/7531860/e4491d1d-dcd1-454d-995a-96043a07ac49)
+![Percentage of Indirect Takedown](https://github.com/foxkill/iron/assets/7531860/82afca95-40d2-4d01-a782-8e24a45e2710)
 
-This screen shows the "Bid To Cover Ratio" for the 10yr tenor
+This screen shows the "Bid To Cover Ratio" for the 10yr tenor:
 
-![Bid to Cover](https://github.com/foxkill/iron/assets/7531860/616c5ad9-7ac3-432b-b3da-cb177e23b3cd)
+![Shows: Bid To Cover Ratio](https://github.com/foxkill/iron/assets/7531860/bc1bb21f-2dd8-4954-9203-7a7950bc60f3)
 
 
