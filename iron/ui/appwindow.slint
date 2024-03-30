@@ -2,40 +2,21 @@ import { VerticalBox, Button, HorizontalBox, LineEdit, StandardTableView, GroupB
 import { CusipInput } from "cusipinput.slint";
 import { SecurityDisplay, SlMap } from "securitydisplay.slint";
 import { AppState } from "appstate.slint";
-import { SecuritiesTableAdapter, QualityTableAdapter } from "tableadapters.slint";
+import { DetailsTableAdapter, QualityTableAdapter, SecuritiesTableAdapter } from "tableadapters.slint";
 import { Resizer } from "resizer.slint";
 
-export { AppState, SecuritiesTableAdapter, QualityTableAdapter, SlMap }
+export { AppState, DetailsTableAdapter, SecuritiesTableAdapter, QualityTableAdapter, SlMap }
 
 export component AppWindow inherits Window {
     out property <int> tab-index: twidget.current-index;
-
     callback close;
-
     title: "Iron - The auction result viewer";
     preferred_width: 1024px;
     preferred_height: 768px;
     VerticalLayout {
         padding: 20px;
         spacing: 20px;
-        HorizontalLayout {
-            spacing: 10px;
-            CusipInput {
-                cusip-changed(cusip) => {
-                    if AppState.validate_cusip(cusip) {
-                        AppState.set-the-cusip(cusip);
-                    }
-                }
-            }
-        }
-
-        HorizontalLayout {
-            Rectangle {
-                height: 2px;
-                background: grey;
-            }
-        }
-
+        
         HorizontalLayout {
             padding: 0px;
             spacing: 0px;
@@ -43,13 +24,31 @@ export component AppWindow inherits Window {
                 Tab {
                     title: "Detail Data";
                     VerticalBox {
+                        CusipInput {
+                            cusip-changed(cusip) => {
+                                if AppState.validate_cusip(cusip) {
+                                    AppState.set-the-cusip(cusip);
+                                }
+                            }
+                        }
+
                         details-display := StandardTableView {
+                            columns: [
+                                { title: "No." },
+                                { title: "Security Term" },
+                                { title: "CUSIP" },
+                                { title: "Reopen?" },
+                                { title: "Type" },
+                                { title: "BTC" },
+                                { title: "Dealers %" },
+                                { title: "Directs %" },
+                                { title: "Indirects %" },
+                                { title: "Yield" },
+                                { title: "Interest" },
+                            ];
+                            rows: DetailsTableAdapter.row_data;
                             // vertical-stretch: 1;
                             // horizontal-stretch: 1;
-                            // columns: [
-                            //     { title: "Header 1" },
-                            //     { title: "Header 2" },
-                            // ];
                         }
                     }
                 }
@@ -168,7 +167,6 @@ export component AppWindow inherits Window {
                                 } else {
                                     self.y = self.current-position;
                                 }
-
                                 hlupper.height = self.y - (self.upper_distance);
                                 hllower.y = self.y + (self.lower_distance);
                                 hllower.height = self.vspace - hlupper.height;
@@ -187,8 +185,8 @@ export component AppWindow inherits Window {
                             quality := StandardTableView {
                                 // horizontal-stretch: 1;
                                 columns: [
-                                    { title: "No." }, 
-                                    { title: "Security Term" }, 
+                                    { title: "No." },
+                                    { title: "Security Term" },
                                     { title: "CUSIP" },
                                     { title: "Reopen?" },
                                     { title: "Type" },

@@ -5,6 +5,7 @@ pub mod handler;
 pub mod model;
 pub mod barchart;
 pub mod qualitymodel;
+pub mod detailmodel;
 
 mod macros;
 
@@ -16,6 +17,6 @@ pub use connect::connect_close;
 pub use barchart::draw_barchart;
 
 pub use handler::handle_cusip;
-pub use model::SlMapModel;
 
+pub use detailmodel::DetailModel;
 pub use qualitymodel::QualityModel;

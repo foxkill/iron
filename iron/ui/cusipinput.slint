@@ -4,7 +4,7 @@ import { AppState } from "appstate.slint";
 export component CusipInput inherits HorizontalBox {
     callback cusip-changed <=> cusip-edit.edited;
     in-out property <string> cusip;
-    in-out property <bool> valid_cusip <=> AppState.valid_cusip;
+    in property <bool> valid_cusip <=> AppState.valid-cusip;
 
     states [ 
         disabled when valid_cusip == false: {
@@ -24,11 +24,9 @@ export component CusipInput inherits HorizontalBox {
             text: "Enter CUSIP:";
         }
     }
-    
 
     cusip-edit := LineEdit {
         placeholder-text: "Enter CUSIP here...";
-        // edited(str) => { root.cusip-changed(str) }
     }
 
     cusip-button := Button {
