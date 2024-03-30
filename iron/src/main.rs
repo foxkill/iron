@@ -17,9 +17,5 @@ fn main() -> Result<(), slint::PlatformError> {
     connect_close(&ui);
     connect_barchart(&ui);
 
-    ui.global::<AppState>().on_takedown_changed(|takedown| {
-        println!("This takedown calling: {takedown}")
-    });
-
     ui.run()
 }
