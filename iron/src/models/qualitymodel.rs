@@ -159,7 +159,7 @@ mod tests {
 
     #[test]
     fn it_should_return_usable_results() {
-        let json = include_str!("dd.json");
+        let json = include_str!("../assets/dd.json");
         let result: Vec<Treasury> =
             serde_json::from_str(json).unwrap_or_else(|_| vec![Treasury::default()]);
         println!("{:#?}", result);

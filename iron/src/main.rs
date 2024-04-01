@@ -1,6 +1,7 @@
 // !# Auction Result Desktop App
 // #![allow(unused_imports)]
 pub mod components;
+pub mod models;
 
 use components::connect_validate_cusip;
 use components::connect_cusip_handler;

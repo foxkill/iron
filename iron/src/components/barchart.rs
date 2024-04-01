@@ -2,7 +2,8 @@
 use plotters::{prelude::*, style::text_anchor::{HPos, Pos, VPos}};
 use slint::SharedPixelBuffer;
 
-use super::qualitymodel::{DataPair, TakeDown};
+use crate::models::qualitymodel::{DataPair, TakeDown};
+
 
 pub fn empty_image() -> slint::Image {
     let mut pixel_buffer = SharedPixelBuffer::new(1, 1);

@@ -1,17 +1,11 @@
 // !# Connects widgets to handlers.
 use crate::{
-    components::{
-        barchart::{draw_barchart, empty_image},
-        model::SlintModelTrait,
-        QualityModel,
-    },
-    AppState, AppWindow,
+    components::barchart::{draw_barchart, empty_image}, models::{model::SlintModelTrait, DetailModel, QualityModel}, AppState, AppWindow
 };
 use auctionresult::validate_cusip;
 use slint::{ComponentHandle, Model, StandardListViewItem, VecModel};
 use std::rc::Rc;
 
-use super::DetailModel;
 use crate::DetailsTableAdapter;
 use crate::QualityTableAdapter;
 
