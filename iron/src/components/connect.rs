@@ -2,12 +2,16 @@
 use crate::{
     components::barchart::{draw_barchart, empty_image}, models::{model::SlintModelTrait, DetailModel, QualityModel}, AppState, AppWindow
 };
+use arboard::Clipboard;
 use auctionresult::validate_cusip;
 use slint::{ComponentHandle, Model, StandardListViewItem, VecModel};
 use std::rc::Rc;
 
 use crate::DetailsTableAdapter;
 use crate::QualityTableAdapter;
+
+// The index into ModelRc<ModelRc<VecModel<StandardListViewItem>>>
+const CUSIP_COLUMN: usize = 2;
 
 pub fn connect_validate_cusip(app: &AppWindow) {
     let ui = app.as_weak();
@@ -110,4 +114,42 @@ pub fn connect_barchart(app: &AppWindow) {
                 takedown.into(),
             )
         });
+}
+
+pub fn connect_clipboard_handler(app: &AppWindow) {
+    let ui = app.as_weak();
+    app.global::<QualityTableAdapter>().on_copy_cusip_to_clipboard(move |index: i32| {
+        let Some(this) = ui.upgrade() else {
+            eprintln!("Could not upgrade window");
+            return;
+        };
+
+        let model = this.global::<QualityTableAdapter>().get_row_data();
+
+        let Some(the_row) = model.row_data(index as usize) else {
+            eprintln!("Could not get QualityTableAdapter.row_data");
+            return;
+        };
+
+        let Some(the_model) = slint::Model::as_any(&the_row).downcast_ref::<VecModel<StandardListViewItem>>() else {
+            eprintln!("Could not downcast to ModelRc<StandardListviewItem>");
+            return;
+        };
+
+        let Some(cusip) = the_model.iter().nth(CUSIP_COLUMN) else {
+            eprintln!("Could not unpack column data (cusip).");
+            return;
+        };
+
+        let Ok(mut clipboard) = Clipboard::new() else {
+            eprintln!("Could not access clipboard, sorry");
+            return;
+        };
+
+        let c = cusip.text.as_str();
+        let Ok(_) = clipboard.set_text(c) else {
+            eprintln!("Couldnt copy cusip to clipboard.");
+            return;
+        };
+    });
 }

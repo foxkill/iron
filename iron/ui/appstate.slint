@@ -7,9 +7,7 @@ export global AppState {
     // Can be: 2yr, 3yr, 5yr, 7yr, 10yr, 20yr, 30yr.
     in property <string> auction-type;
 
-    
     // Callbacks.
-    callback takedown-changed(int);
     pure callback set-cusip(string) -> int; 
     pure callback validate_cusip(string) -> bool;
     pure callback render_plot(length, length, int) -> image;

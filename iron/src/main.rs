@@ -3,6 +3,7 @@
 pub mod components;
 pub mod models;
 
+use components::connect_clipboard_handler;
 use components::connect_validate_cusip;
 use components::connect_cusip_handler;
 use components::connect_barchart;
@@ -17,6 +18,7 @@ fn main() -> Result<(), slint::PlatformError> {
     connect_cusip_handler(&ui);
     connect_close(&ui);
     connect_barchart(&ui);
+    connect_clipboard_handler(&ui);
 
     ui.run()
 }

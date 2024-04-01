@@ -16,3 +16,4 @@ pub fn handle_cusip(cusip: impl Into<String>) {
     // let mrc = ModelRc::from(Rc::new(vm));
     // ui.set_rows(mrc);
 }
+

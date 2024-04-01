@@ -10,7 +10,13 @@ use auctionresult::{treasury::Treasury, Get};
 use slint::{ModelRc, SharedString, StandardListViewItem, VecModel};
 
 use crate::{add, rows, SlMap};
-
+/*
+let items = Rc::new(VecModel::default());
+let lastname = StandardListViewItem::from(slint::format!("{}", u.lastname));
+let firstname = StandardListViewItem::from(slint::format!("{}", u.firstname));
+let mail = StandardListViewItem::from(slint::format!("{}", u.email));
+let city = StandardListViewItem::from(slint::format!("{} {}", u.address.zip, u.address.city));
+*/
 enum TabState {
     Details,
 }

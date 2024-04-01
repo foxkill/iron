@@ -3,7 +3,8 @@ export global DetailsTableAdapter {
 }
 
 export global QualityTableAdapter {
-    in property <[[StandardListViewItem]]> row_data;
+    callback copy_cusip_to_clipboard(int);
+    in-out property <[[StandardListViewItem]]> row_data;
 }
 
 export global SecuritiesTableAdapter {

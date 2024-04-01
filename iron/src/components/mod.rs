@@ -10,6 +10,7 @@ pub use connect::connect_validate_cusip;
 pub use connect::connect_cusip_handler;
 pub use connect::connect_barchart;
 pub use connect::connect_close;
+pub use connect::connect_clipboard_handler;
 
 pub use barchart::draw_barchart;
 

@@ -161,17 +161,20 @@ export component AppWindow inherits Window {
                                 hlupper.height = self.y - (self.upper_distance);
                                 hllower.y = self.y + (self.lower_distance);
                                 hllower.height = self.vspace - hlupper.height;
-                                // hllower.height = hllower.height;
-                                // hllower.height -= hllower.y;
-                                // hllower.height = hllower.height - (self.y + self.height);
-                                // debug(self.y, hlupper.height, hllower.y, toolbar.height);
                             }
                         }
 
                         hllower := HorizontalLayout {
-                            // height: 50%;
                             quality := StandardTableView {
-                                // horizontal-stretch: 1;
+                                row-pointer-event(row, event, pt) => {
+                                    if (
+                                        event.button == PointerEventButton.left &&
+                                        event.kind == PointerEventKind.down &&
+                                        event.modifiers.shift == true
+                                    ) {
+                                        QualityTableAdapter.copy_cusip_to_clipboard(row);
+                                    }
+                                }
                                 columns: HeaderData.header;
                                 rows: QualityTableAdapter.row_data;
                             }
