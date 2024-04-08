@@ -146,8 +146,7 @@ pub fn connect_clipboard_handler(app: &AppWindow) {
             return;
         };
 
-        let c = cusip.text.as_str();
-        let Ok(_) = clipboard.set_text(c) else {
+        let Ok(_) = clipboard.set_text(cusip.text.as_str()) else {
             eprintln!("Couldnt copy cusip to clipboard.");
             return;
         };
