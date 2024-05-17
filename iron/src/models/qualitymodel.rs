@@ -150,8 +150,6 @@ impl QualityModel {
     }
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::DataPair;
