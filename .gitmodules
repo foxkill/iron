@@ -1,0 +1,3 @@
+[submodule "auctionresult"]
+	path = auctionresult
+	url = https://github.com/foxkill/auctionresult.git
